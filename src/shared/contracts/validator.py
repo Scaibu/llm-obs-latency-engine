@@ -1,15 +1,15 @@
-import re
 from pathlib import Path
 from shared.errors.base import ValidationError
+from python_shared import ValidationRules
 
 BASE_DIR = Path(__file__).resolve().parents[3]
 WORKFLOW_CONTRACT: Path = BASE_DIR / "contracts" / "workflows" / "latency_baseline_workflow.yaml"
 
 def _extract_val(text: str, pattern: str) -> str:
-    m = re.search(pattern, text, re.MULTILINE)
-    if not m:
-        raise ValidationError(f"Missing expected pattern in contract: {pattern}")
-    return m.group(1).strip()
+    try:
+        return ValidationRules.extract_pattern(text, pattern)
+    except ValueError as e:
+        raise ValidationError(str(e))
 
 def load_workflow_contracts() -> dict:
     if not WORKFLOW_CONTRACT.exists():
