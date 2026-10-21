@@ -8,6 +8,7 @@ from fastapi import FastAPI
 
 from api.rest.v1.router import router as v1_router
 from api.rest.middleware.tracing_middleware import HTTPTracingMiddleware
+from python_shared.http.middleware.correlation_middleware import CorrelationAndTelemetryMiddleware
 from config import load_config
 from features.latency_query.service import LatencyQueryService
 from infra.adapters.redis.latency_redis_adapter import LatencyRedisAdapter
@@ -25,6 +26,7 @@ def create_app() -> FastAPI:
         description="Internal service-to-service API for querying latency percentiles, SLO burn rates, and historical baselines.",
         version="1.0.0",
     )
+    app.add_middleware(CorrelationAndTelemetryMiddleware)
     app.add_middleware(HTTPTracingMiddleware)
 
     cfg = load_config()
